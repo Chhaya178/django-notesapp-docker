@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notesapp-deployment
+  namespace: notesapp
+spec:
+  replicas: 2
+  selector:
+    matchlabels:
+      app: notesapp
+  template:
+    metadata:
+      name: notesapp-pod
+      labels:
+        app: notesapp
+    spec:
+      containers:
+        - name: notesapp-cont
+          image: shadowigw/notes-app:latest
+          ports:
+           - containerPort: 8000

@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+   name: notesapp-service
+   namespace: notesapp
+spec:
+  selector:
+    app: notesapp
+  ports:
+   - protocol: TCP
+     port: 80
+     targetPort: 8000
+  type: NodePort
