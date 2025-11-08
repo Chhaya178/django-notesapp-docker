@@ -6,7 +6,7 @@ metadata:
 spec:
   replicas: 2
   selector:
-    matchlabels:
+    matchLabels:
       app: notesapp
   template:
     metadata:
@@ -14,8 +14,32 @@ spec:
       labels:
         app: notesapp
     spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox
+          command: ['sh', '-c', 'until nc -z mysql-service 3306; do echo waiting for db; sleep 3; done;']
       containers:
         - name: notesapp-cont
           image: shadowigw/notes-app:latest
           ports:
            - containerPort: 8000
+          env:
+           - name: DB_USER
+             value: root
+           - name: DB_HOST
+             value: mysql-service
+           - name: DB_NAME 
+             valueFrom:
+               secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-database
+           - name: DB_PASSWORD
+             valueFrom:
+               secretKeyRef:
+                 name: mysql-secret
+                 key: mysql-root-password
+          command: ["sh", "-c"]
+          args:
+            - |
+                python manage.py migrate --no-input && \
+                gunicorn inotesapp.wsgi:application --bind 0.0.0.0:8000
