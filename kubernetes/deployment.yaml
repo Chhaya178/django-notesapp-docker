@@ -4,7 +4,7 @@ metadata:
   name: notesapp-deployment
   namespace: notesapp
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: notesapp
@@ -19,7 +19,7 @@ spec:
           image: busybox
           command: ['sh', '-c', 'until nc -z mysql-service 3306; do echo waiting for db; sleep 3; done;']
       containers:
-        - name: notesapp-cont
+        - name: django
           image: shadowigw/notes-app:latest
           ports:
            - containerPort: 8000
@@ -42,4 +42,4 @@ spec:
           args:
             - |
                 python manage.py migrate --no-input && \
-                gunicorn inotesapp.wsgi:application --bind 0.0.0.0:8000
+                gunicorn notesapp.wsgi:application --bind 0.0.0.0:8000
